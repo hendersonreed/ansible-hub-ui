@@ -50,13 +50,21 @@ Cypress.Commands.add('logout', {}, () => {
 });
 
 Cypress.Commands.add('login', {}, (username, password) => {
-    cy.server();
-    cy.route('POST', Cypress.env('prefix') + '_ui/v1/auth/login/').as('login');
-    cy.route('GET', Cypress.env('prefix') + '_ui/v1/me/').as('me');
-    cy.get('#pf-login-username-id').type(username);
-    cy.get('#pf-login-password-id').type(`${password}{enter}`);
-    cy.wait('@login');
-    cy.wait('@me');
+    let loginUrl = Cypress.env('prefix') + '_ui/v1/auth/login';
+
+    cy.request({
+        url: loginUrl,
+        method: 'POST',
+        body: {
+            username: username,
+            password: password
+        },
+        headers: {
+            'Accept': 'application/json, text/plain, */*',
+            'Content-Type': 'application/json;charset=utf-8'
+        },
+        gzip: true
+    });
 });
 
 Cypress.Commands.add('createUser', {}, (username, password, firstName = null, lastName = null, email = null) => {
